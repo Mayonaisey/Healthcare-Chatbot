@@ -117,7 +117,7 @@
       <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
       <ul class="list-unstyled">
         <li><a href="index.html"> <i class="icon-home"></i>Home </a></li>
-        <li><a href="tables.html"> <i class="icon-grid"></i>Tables </a></li>
+        <li><a href="tables.php"> <i class="icon-grid"></i>Tables </a></li>
         <li><a href="charts.html"> <i class="fa fa-bar-chart"></i>Charts </a></li>
         <li class="active"><a href="forms.html"> <i class="icon-padnote"></i>Appointments </a></li>
         <li><a href="#exampledropdownDropdown" aria-expanded="false" data-toggle="collapse"> <i
