@@ -27,9 +27,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['first_name']) && !isse
   // Insert data into the table
   $sql = "INSERT INTO doctors (first_name, last_name, email, gender, clinic_address, phone_number, specialty, experience_years) 
             VALUES ('$first_name', '$last_name', '$email', '$gender', '$clinic_address', '$phone_number', '$specialty', '$experience_years')";
+            if (!$result) {
+              die("Query failed fe line 31 ya zeeeee: " . $conn->error);
+          }
+          
 
   if ($conn->query($sql) === TRUE) {
-    header("Location: doctor.php");
+    header("Location: index.php");
     exit();
   } else {
     echo "Error: " . $sql . "<br>" . $conn->error;
@@ -41,9 +45,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_doctor'])) {
   $doctor_id = $_POST['doctor_id'];
 
   $sql = "DELETE FROM doctors WHERE doctor_id = $doctor_id";
+  if (!$result) {
+    die("Query failed fe line 45 ya zeee: " . $conn->error);
+}
+
 
   if ($conn->query($sql) === TRUE) {
-    header("Location: doctor.php");
+    header("Location: index.php");
     exit();
   } else {
     echo "Error: " . $sql . "<br>" . $conn->error;
@@ -69,8 +77,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['doctor_id_edit'])) {
               experience_years='$experience_years'
           WHERE doctor_id=$doctor_id";
 
+if (!$result) {
+  die("Query failed el moshkela fe line 73 ya zee: " . $conn->error);
+}
+
   if ($conn->query($sql) === TRUE) {
-    header("Location: doctor.php");
+    header("Location: index.php");
     exit();
   } else {
     echo "Error: " . $sql . "<br>" . $conn->error;
@@ -160,25 +172,22 @@ $conn->close();
   </style>
   <script>
     function showAddDoctorForm() {
-      document.getElementById('add-doctor-row').style.display = 'table-row';
-    }
+    document.getElementById('add-doctor-row').style.display = 'table-row';
+}
 
-    // Show the edit form and populate it with current values
-    function showEditDoctorForm(doctorId, firstName, lastName, email, gender, clinicAddress, phoneNumber, specialty, experienceYears) {
-      // Fill the form with current values
-      document.getElementById('doctor_id_edit').value = doctorId;
-      document.getElementById('edit_first_name').value = firstName;
-      document.getElementById('edit_last_name').value = lastName;
-      document.getElementById('edit_email').value = email;
-      document.getElementById('edit_gender').value = gender;
-      document.getElementById('edit_clinic_address').value = clinicAddress;
-      document.getElementById('edit_phone_number').value = phoneNumber;
-      document.getElementById('edit_specialty').value = specialty;
-      document.getElementById('edit_experience_years').value = experienceYears;
+function showEditDoctorForm(doctorId, firstName, lastName, email, gender, clinicAddress, phoneNumber, specialty, experienceYears) {
+    document.getElementById('doctor_id_edit').value = doctorId;
+    document.getElementById('edit_first_name').value = firstName;
+    document.getElementById('edit_last_name').value = lastName;
+    document.getElementById('edit_email').value = email;
+    document.getElementById('edit_gender').value = gender;
+    document.getElementById('edit_clinic_address').value = clinicAddress;
+    document.getElementById('edit_phone_number').value = phoneNumber;
+    document.getElementById('edit_specialty').value = specialty;
+    document.getElementById('edit_experience_years').value = experienceYears;
+    document.getElementById('edit-doctor-row').style.display = 'table-row';
+}
 
-      // Show the edit form
-      document.getElementById('edit-doctor-row').style.display = 'table-row';
-    }
   </script>
 </head>
 
@@ -220,6 +229,9 @@ $conn->close();
                 <tbody>
                   <?php
                   $conn = new mysqli("localhost", "root", "", "project_drs");
+                  
+                
+                
 
                   if ($conn->connect_error) {
                     die("Connection failed: " . $conn->connect_error);
@@ -227,6 +239,10 @@ $conn->close();
 
                   $sql = "SELECT doctor_id, first_name, last_name, email, gender, clinic_address, phone_number, specialty, experience_years, created_at FROM doctors";
                   $result = $conn->query($sql);
+                  if (!$result) {
+                    die("Query failed  fe 244 ya zee: " . $conn->error);
+                }
+                
 
                   if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
@@ -272,7 +288,7 @@ $conn->close();
 
                   <!-- Form Row for Adding a New Doctor -->
                   <tr id="add-doctor-row" class="form-row">
-                    <form action="doctor.php" method="POST">
+                    <form action="index.php" method="POST">
                       <td>#</td>
                       <td><input type="text" name="first_name" required></td>
                       <td><input type="text" name="last_name" required></td>
@@ -313,7 +329,7 @@ $conn->close();
 
                   <!-- Form Row for Editing doctor -->
                   <tr id="edit-doctor-row" class="form-row edit-form">
-                    <form action="doctor.php" method="POST">
+                    <form action="index.php" method="POST">
                       <td>#</td>
                       <td><input type="hidden" id="doctor_id_edit" name="doctor_id_edit">
                         <input type="text" id="edit_first_name" name="first_name" required>
