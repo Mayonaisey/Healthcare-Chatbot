@@ -4,8 +4,7 @@
 $servername = "localhost";
 $username = "root";  // Replace with your database username
 $password = "";  // Replace with your database password
-$dbname = "project_drs";
-
+$dbname = "medical_chatbot";  // Replace with your database name
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
