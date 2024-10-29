@@ -2,7 +2,7 @@
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "project_drs";
+$dbname = "medical_chatbot";  
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -27,13 +27,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['first_name']) && !isse
   // Insert data into the table
   $sql = "INSERT INTO doctors (first_name, last_name, email, gender, clinic_address, phone_number, specialty, experience_years) 
             VALUES ('$first_name', '$last_name', '$email', '$gender', '$clinic_address', '$phone_number', '$specialty', '$experience_years')";
-            if (!$result) {
-              die("Query failed fe line 31 ya zeeeee: " . $conn->error);
-          }
+            
           
 
   if ($conn->query($sql) === TRUE) {
-    header("Location: index.php");
+    header("Location:tables.php");
     exit();
   } else {
     echo "Error: " . $sql . "<br>" . $conn->error;
@@ -45,13 +43,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_doctor'])) {
   $doctor_id = $_POST['doctor_id'];
 
   $sql = "DELETE FROM doctors WHERE doctor_id = $doctor_id";
-  if (!$result) {
-    die("Query failed fe line 45 ya zeee: " . $conn->error);
-}
+  
 
 
   if ($conn->query($sql) === TRUE) {
-    header("Location: index.php");
+    header("Location:tables.php");
     exit();
   } else {
     echo "Error: " . $sql . "<br>" . $conn->error;
@@ -77,12 +73,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['doctor_id_edit'])) {
               experience_years='$experience_years'
           WHERE doctor_id=$doctor_id";
 
-if (!$result) {
-  die("Query failed el moshkela fe line 73 ya zee: " . $conn->error);
-}
+
 
   if ($conn->query($sql) === TRUE) {
-    header("Location: index.php");
+    header("Location: tables.php");
     exit();
   } else {
     echo "Error: " . $sql . "<br>" . $conn->error;
@@ -228,10 +222,10 @@ function showEditDoctorForm(doctorId, firstName, lastName, email, gender, clinic
                 </thead>
                 <tbody>
                   <?php
-                  $conn = new mysqli("localhost", "root", "", "project_drs");
+                  $conn = new mysqli("localhost", "root", "", "medical_chatbot");
                   
                 
-                
+
 
                   if ($conn->connect_error) {
                     die("Connection failed: " . $conn->connect_error);
@@ -272,7 +266,7 @@ function showEditDoctorForm(doctorId, firstName, lastName, email, gender, clinic
                             )\">Edit</button>
 
                             <!-- Delete button -->
-                            <form action='doctor.php' method='POST' style='display:inline;'>
+                            <form action='tables.php' method='POST' style='display:inline;'>
                                 <input type='hidden' name='doctor_id' value='" . $row["doctor_id"] . "'>
                                 <button type='submit' name='delete_doctor'>Delete</button>
                             </form>
@@ -288,7 +282,7 @@ function showEditDoctorForm(doctorId, firstName, lastName, email, gender, clinic
 
                   <!-- Form Row for Adding a New Doctor -->
                   <tr id="add-doctor-row" class="form-row">
-                    <form action="index.php" method="POST">
+                    <form action="tables.php" method="POST">
                       <td>#</td>
                       <td><input type="text" name="first_name" required></td>
                       <td><input type="text" name="last_name" required></td>
@@ -329,7 +323,7 @@ function showEditDoctorForm(doctorId, firstName, lastName, email, gender, clinic
 
                   <!-- Form Row for Editing doctor -->
                   <tr id="edit-doctor-row" class="form-row edit-form">
-                    <form action="index.php" method="POST">
+                    <form action="tables.php" method="POST">
                       <td>#</td>
                       <td><input type="hidden" id="doctor_id_edit" name="doctor_id_edit">
                         <input type="text" id="edit_first_name" name="first_name" required>
