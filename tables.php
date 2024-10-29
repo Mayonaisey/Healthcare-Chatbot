@@ -12,6 +12,8 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
+
+
 // Handle form submission for adding a new doctor
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['first_name']) && !isset($_POST['doctor_id_edit'])) {
   // Get form data
@@ -34,7 +36,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['first_name']) && !isse
     header("Location:tables.php");
     exit();
   } else {
-    echo "Error: " . $sql . "<br>" . $conn->error;
+    // Check if the error is due to a duplicate email
+    if ($conn->errno == 1062) {  // MySQL error code for duplicate entry
+      echo "<script>alert('Error: This email already exists. Please use a different email.');</script>";
+  } else {
+      echo "<script>alert('Error adding doctor: " . $conn->error . "');</script>";
+  }
   }
 }
 
@@ -50,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_doctor'])) {
     header("Location:tables.php");
     exit();
   } else {
-    echo "Error: " . $sql . "<br>" . $conn->error;
+    echo "<script>alert('Error deleting doctor: " . $conn->error . "');</script>";
   }
 }
 
@@ -79,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['doctor_id_edit'])) {
     header("Location: tables.php");
     exit();
   } else {
-    echo "Error: " . $sql . "<br>" . $conn->error;
+    echo "<script>alert('Error updating doctor: " . $conn->error . "');</script>";
   }
 }
 
@@ -213,6 +220,7 @@ $conn->close();
                   <th>First Name</th>
                   <th>Last Name</th>
                   <th>Email</th>
+                  
                   <th>Gender</th>
                   <th>Clinic Address</th>
                   <th>Phone Number</th>
