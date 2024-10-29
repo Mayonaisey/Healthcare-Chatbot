@@ -2,7 +2,7 @@
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "medical_chatbot";  
+$dbname = "medical_chatbot";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -27,8 +27,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['first_name']) && !isse
   // Insert data into the table
   $sql = "INSERT INTO doctors (first_name, last_name, email, gender, clinic_address, phone_number, specialty, experience_years) 
             VALUES ('$first_name', '$last_name', '$email', '$gender', '$clinic_address', '$phone_number', '$specialty', '$experience_years')";
-            
-          
+
+
 
   if ($conn->query($sql) === TRUE) {
     header("Location:tables.php");
@@ -43,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_doctor'])) {
   $doctor_id = $_POST['doctor_id'];
 
   $sql = "DELETE FROM doctors WHERE doctor_id = $doctor_id";
-  
+
 
 
   if ($conn->query($sql) === TRUE) {
@@ -146,13 +146,14 @@ $conn->close();
 
     #add-button {
       margin-bottom: 10px;
-      color:  #ced4da;
+      color: #ced4da;
       background-color: #6c757d;
 
 
     }
-    button{
-      color:  #ced4da;
+
+    button {
+      color: #ced4da;
       background-color: #6c757d;
     }
 
@@ -160,87 +161,88 @@ $conn->close();
       display: none;
     }
 
-    .form-row, .edit-form {
-    display: none; /* Hide the rows initially */
-  }
+    .form-row,
+    .edit-form {
+      display: none;
+      /* Hide the rows initially */
+    }
   </style>
   <script>
     function showAddDoctorForm() {
-    document.getElementById('add-doctor-row').style.display = 'table-row';
-}
+      document.getElementById('add-doctor-row').style.display = 'table-row';
+    }
 
-function showEditDoctorForm(doctorId, firstName, lastName, email, gender, clinicAddress, phoneNumber, specialty, experienceYears) {
-    document.getElementById('doctor_id_edit').value = doctorId;
-    document.getElementById('edit_first_name').value = firstName;
-    document.getElementById('edit_last_name').value = lastName;
-    document.getElementById('edit_email').value = email;
-    document.getElementById('edit_gender').value = gender;
-    document.getElementById('edit_clinic_address').value = clinicAddress;
-    document.getElementById('edit_phone_number').value = phoneNumber;
-    document.getElementById('edit_specialty').value = specialty;
-    document.getElementById('edit_experience_years').value = experienceYears;
-    document.getElementById('edit-doctor-row').style.display = 'table-row';
-}
-
+    function showEditDoctorForm(doctorId, firstName, lastName, email, gender, clinicAddress, phoneNumber, specialty, experienceYears) {
+      document.getElementById('doctor_id_edit').value = doctorId;
+      document.getElementById('edit_first_name').value = firstName;
+      document.getElementById('edit_last_name').value = lastName;
+      document.getElementById('edit_email').value = email;
+      document.getElementById('edit_gender').value = gender;
+      document.getElementById('edit_clinic_address').value = clinicAddress;
+      document.getElementById('edit_phone_number').value = phoneNumber;
+      document.getElementById('edit_specialty').value = specialty;
+      document.getElementById('edit_experience_years').value = experienceYears;
+      document.getElementById('edit-doctor-row').style.display = 'table-row';
+    }
   </script>
 </head>
 
 <body>
 
   <!--el header file henaaaa-->
-   <?php include 'header.html';?>
+  <?php include 'header.html'; ?>
 
   <div class="d-flex align-items-stretch">
-  <!--sideee-->
-  <?php include 'side.html';?>
+    <!--sideee-->
+    <?php include 'side.html'; ?>
 
-      <section class="no-padding-top">
-        <div class="container-fluid">
-
-
-          <div class="block">
-            <!-- Add Doctor Button -->
-            <button id="add-button" onclick="showAddDoctorForm()">Add Doctor</button>
-
-            <div class="title"><strong>Doctors Table</strong></div>
-            <div class="table-responsive">
-              <table class="table table-striped table-hover">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email</th>
-                    <th>Gender</th>
-                    <th>Clinic Address</th>
-                    <th>Phone Number</th>
-                    <th>Specialty</th>
-                    <th>Experience (Years)</th>
-                    <th>Created At</th>
-                    <th>...</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <?php
-                  $conn = new mysqli("localhost", "root", "", "medical_chatbot");
-                  
-                
+    <section class="no-padding-top">
+      <div class="container-fluid">
 
 
-                  if ($conn->connect_error) {
-                    die("Connection failed: " . $conn->connect_error);
-                  }
+        <div class="block">
+          <!-- Add Doctor Button -->
+          <button id="add-button" onclick="showAddDoctorForm()">Add Doctor</button>
 
-                  $sql = "SELECT doctor_id, first_name, last_name, email, gender, clinic_address, phone_number, specialty, experience_years, created_at FROM doctors";
-                  $result = $conn->query($sql);
-                  if (!$result) {
-                    die("Query failed  fe 244 ya zee: " . $conn->error);
+          <div class="title"><strong>Doctors Table</strong></div>
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th>Email</th>
+                  <th>Gender</th>
+                  <th>Clinic Address</th>
+                  <th>Phone Number</th>
+                  <th>Specialty</th>
+                  <th>Experience (Years)</th>
+                  <th>Created At</th>
+                  <th>...</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php
+                $conn = new mysqli("localhost", "root", "", "medical_chatbot");
+
+
+
+
+                if ($conn->connect_error) {
+                  die("Connection failed: " . $conn->connect_error);
                 }
-                
 
-                  if ($result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                      echo "<tr>
+                $sql = "SELECT doctor_id, first_name, last_name, email, gender, clinic_address, phone_number, specialty, experience_years, created_at FROM doctors";
+                $result = $conn->query($sql);
+                if (!$result) {
+                  die("Query failed  fe 244 ya zee: " . $conn->error);
+                }
+
+
+                if ($result->num_rows > 0) {
+                  while ($row = $result->fetch_assoc()) {
+                    echo "<tr>
                         <td>" . $row["doctor_id"] . "</td>
                         <td>" . $row["first_name"] . "</td>
                         <td>" . $row["last_name"] . "</td>
@@ -272,105 +274,109 @@ function showEditDoctorForm(doctorId, firstName, lastName, email, gender, clinic
                             </form>
                         </td>
                       </tr>";
-                    }
-                  } else {
-                    echo "<tr><td colspan='12'>No data found</td></tr>";
                   }
+                } else {
+                  echo "<tr><td colspan='12'>No data found</td></tr>";
+                }
 
-                  $conn->close();
-                  ?>
+                $conn->close();
+                ?>
 
-                  <!-- Form Row for Adding a New Doctor -->
-                  <tr id="add-doctor-row" class="form-row">
-                    <form action="tables.php" method="POST">
-                      <td>#</td>
-                      <td><input type="text" name="first_name" required></td>
-                      <td><input type="text" name="last_name" required></td>
-                      <td><input type="email" name="email" required></td>
-                      <td>
-                        <select name="gender" required>
-                          <option value="Male">Male</option>
-                          <option value="Female">Female</option>
-                        </select>
-                      </td>
-                      <td><input type="text" name="clinic_address" required></td>
-                      <td><input type="text" name="phone_number" pattern="0[0-9]{10}" required></td>
-                      <td>
-                        <select name="specialty" required>
-                          <option value="Cardiology">Cardiology</option>
-                          <option value="Dermatology">Dermatology</option>
-                          <option value="Emergency Medicine">Emergency Medicine</option>
-                          <option value="Family Medicine">Family Medicine</option>
-                          <option value="Internal Medicine">Internal Medicine</option>
-                          <option value="Neurology">Neurology</option>
-                          <option value="Obstetrics and Gynecology">Obstetrics and Gynecology</option>
-                          <option value="Pediatrics">Pediatrics</option>
-                          <option value="Psychiatry">Psychiatry</option>
-                          <option value="Surgery">Surgery</option>
-                          <option value="Ophthalmology">Ophthalmology</option>
-                          <option value="Orthopedics">Orthopedics</option>
-                          <option value="Anesthesiology">Anesthesiology</option>
-                          <option value="Radiology">Radiology</option>
-                          <option value="Gastroenterology">Gastroenterology</option>
-                        </select>
-                      </td>
-                      <td><input type="number" name="experience_years" min="0" max="11"></td>
-                      <td colspan="2">
-                        <button type="submit">Add Doctor</button>
-                      </td>
-                    </form>
-                  </tr>
+                <!-- Form Row for Adding a New Doctor -->
+                <tr id="add-doctor-row" class="form-row">
+                  <form action="tables.php" method="POST">
+                    <td>#</td>
+                    <td><input type="text" name="first_name" required></td>
+                    <td><input type="text" name="last_name" required></td>
+                    <td><input type="email" name="email" required></td>
+                    <td>
+                      <select name="gender" required>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                      </select>
+                    </td>
+                    <td><input type="text" name="clinic_address" required></td>
+                    <td><input type="text" name="phone_number" pattern="0[0-9]{10}" required></td>
+                    <td>
+                      <select name="specialty" required>
+                        <option value="Cardiology">Cardiology</option>
+                        <option value="Dermatology">Dermatology</option>
+                        <option value="Emergency Medicine">Emergency Medicine</option>
+                        <option value="Family Medicine">Family Medicine</option>
+                        <option value="Internal Medicine">Internal Medicine</option>
+                        <option value="Neurology">Neurology</option>
+                        <option value="Obstetrics and Gynecology">Obstetrics and Gynecology</option>
+                        <option value="Pediatrics">Pediatrics</option>
+                        <option value="Psychiatry">Psychiatry</option>
+                        <option value="Surgery">Surgery</option>
+                        <option value="Ophthalmology">Ophthalmology</option>
+                        <option value="Orthopedics">Orthopedics</option>
+                        <option value="Anesthesiology">Anesthesiology</option>
+                        <option value="Radiology">Radiology</option>
+                        <option value="Gastroenterology">Gastroenterology</option>
+                      </select>
+                    </td>
+                    <td><input type="number" name="experience_years" min="0" max="11"></td>
+                    <td colspan="2">
+                      <button type="submit">Add Doctor</button>
+                    </td>
+                  </form>
+                </tr>
 
-                  <!-- Form Row for Editing doctor -->
-                  <tr id="edit-doctor-row" class="form-row edit-form">
-                    <form action="tables.php" method="POST">
-                      <td>#</td>
-                      <td><input type="hidden" id="doctor_id_edit" name="doctor_id_edit">
-                        <input type="text" id="edit_first_name" name="first_name" required>
-                      </td>
-                      <td><input type="text" id="edit_last_name" name="last_name" required></td>
-                      <td><input type="email" id="edit_email" name="email" required></td>
-                      <td>
-                        <select id="edit_gender" name="gender" required>
-                          <option value="Male">Male</option>
-                          <option value="Female">Female</option>
-                        </select>
-                      </td>
-                      <td><input type="text" id="edit_clinic_address" name="clinic_address" required></td>
-                      <td><input type="text" id="edit_phone_number" name="phone_number" pattern="0[0-9]{10}" required></td>
-                      <td> <select name="specialty" required>
-                          <option value="Cardiology">Cardiology</option>
-                          <option value="Dermatology">Dermatology</option>
-                          <option value="Emergency Medicine">Emergency Medicine</option>
-                          <option value="Family Medicine">Family Medicine</option>
-                          <option value="Internal Medicine">Internal Medicine</option>
-                          <option value="Neurology">Neurology</option>
-                          <option value="Obstetrics and Gynecology">Obstetrics and Gynecology</option>
-                          <option value="Pediatrics">Pediatrics</option>
-                          <option value="Psychiatry">Psychiatry</option>
-                          <option value="Surgery">Surgery</option>
-                          <option value="Ophthalmology">Ophthalmology</option>
-                          <option value="Orthopedics">Orthopedics</option>
-                          <option value="Anesthesiology">Anesthesiology</option>
-                          <option value="Radiology">Radiology</option>
-                          <option value="Gastroenterology">Gastroenterology</option>
-                        </select></td>
-                      <td><input type="number" id="edit_experience_years" name="experience_years" min="0" max="11"></td>
-                      <td colspan="2">
-                        <button type="submit">Save Changes</button>
-                      </td>
-                    </form>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+                <!-- Form Row for Editing doctor -->
+                <tr id="edit-doctor-row" class="form-row edit-form">
+                  <form action="tables.php" method="POST">
+                    <td>#</td>
+                    <td>
+                      <input type="hidden" id="doctor_id_edit" name="doctor_id_edit">
+                      <input type="text" id="edit_first_name" name="first_name" required>
+                    </td>
+                    <td><input type="text" id="edit_last_name" name="last_name" required></td>
+                    <td><input type="email" id="edit_email" name="email" required></td>
+                    <td>
+                      <select id="edit_gender" name="gender" required>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                      </select>
+                    </td>
+                    <td><input type="text" id="edit_clinic_address" name="clinic_address" required></td>
+                    <td><input type="text" id="edit_phone_number" name="phone_number" pattern="0[0-9]{10}" required></td>
+                    <td>
+                      <select id="edit_specialty" name="specialty" required> <!-- Ensure this ID is correct -->
+                        <option value="Cardiology">Cardiology</option>
+                        <option value="Dermatology">Dermatology</option>
+                        <option value="Emergency Medicine">Emergency Medicine</option>
+                        <option value="Family Medicine">Family Medicine</option>
+                        <option value="Internal Medicine">Internal Medicine</option>
+                        <option value="Neurology">Neurology</option>
+                        <option value="Obstetrics and Gynecology">Obstetrics and Gynecology</option>
+                        <option value="Pediatrics">Pediatrics</option>
+                        <option value="Psychiatry">Psychiatry</option>
+                        <option value="Surgery">Surgery</option>
+                        <option value="Ophthalmology">Ophthalmology</option>
+                        <option value="Orthopedics">Orthopedics</option>
+                        <option value="Anesthesiology">Anesthesiology</option>
+                        <option value="Radiology">Radiology</option>
+                        <option value="Gastroenterology">Gastroenterology</option>
+                      </select>
+                    </td>
+                    <td><input type="number" id="edit_experience_years" name="experience_years" min="0" max="11"></td>
+                    <td colspan="2">
+                      <button type="submit">Save Changes</button>
+                    </td>
+                  </form>
+                </tr>
+
+              </tbody>
+            </table>
           </div>
         </div>
+      </div>
 
-    </div>
+  </div>
   </div>
   </section>
-  <?php include 'footer.html';?>
+  <?php include 'footer.html'; ?>
 
   </div>
   </div>
