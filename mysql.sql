@@ -6,7 +6,7 @@ CREATE TABLE Users (
     email VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     dob DATE,
-    gender ENUM('Male', 'Female', 'Other'),
+    gender ENUM('Male', 'Female'),
     phone_number VARCHAR(15),
     height DECIMAL(5,2),
     weight DECIMAL(5,2),

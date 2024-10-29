@@ -2,16 +2,17 @@
 $servername="localhost";
 $username = "root";
 $password = "";
-$dbname = "mysql;";
+$dbname = "medical_chatbot";
 $conn=new mysqli($servername, $username, $password, $dbname);
 
-if($conn->connect_error){
-    die("connection failed:".$conn->connect_error);
+if ($conn->connect_error) {
+    die("connection failed: " . $conn->connect_error);
 }
 $errors=[];
 $data=[];
 if($_SERVER['REQUEST_METHOD']==='POST'){
     if(isset($_POST['add_user'])){
+        var_dump($_POST);
         $data=[
          'first_name'=>$_POST['first_name']??'',
          'last_name'=>$_POST['last_name']??'',
@@ -35,6 +36,13 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
         if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
             $errors['email'] = "Please enter a valid email address.";
         }
+        $stmt=$conn->prepare("SELECT *FROM users WHERE email=?");
+        $stmt->bind_param("s",$data['email']);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows > 0) {
+            $errors['email'] = "This email is already taken. Please use a different email.";
+        }
         if (!preg_match("/^(010|011|012)\d{8}$/", $data['phone_number'])) {
             $errors['phone_number'] = "Phone number must start with 010, 011, or 012 and contain 11 digits.";
         }
@@ -54,7 +62,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
             $first_name = $data['first_name'];
             $last_name = $data['last_name'];
             $email = $data['email'];
-            $password_hash = password_hash($data['password'], PASSWORD_DEFAULT);
+            $password_hash=$data['password'];
             $dob = $data['dob'];
             $gender = $data['gender'];
             $phone_number = $data['phone_number'];
@@ -66,10 +74,11 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
             $current_medications = $data['current_medications'];
 
             $stmt=$conn->prepare("INSERT INTO users (first_name, last_name, email, password_hash, dob, gender, phone_number, height, weight, bmi, medical_history, allergies, current_medications) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $password_hash=password_hash($password,PASSWORD_DEFAULT);
             $stmt->bind_param("sssssssdddsss",$first_name, $last_name, $email, $password_hash, $dob, $gender, $phone_number, $height, $weight, $bmi, $medical_history, $allergies, $current_medications);
             if ($stmt->execute()) {
                 echo "user added successfuly";
+                header("Location: " . $_SERVER['PHP_SELF']);
+                exit();
             }
             else{
                 echo "error:".$stmt->error;
@@ -98,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['user_id'])){
     $bmi=$weight> 0 && $height >0 ? $weight/(($height/100)*($height/100)):null;
     $stmt=$conn->prepare("UPDATE Users SET first_name=?,last_name=?,email=? ,password_hash=?,dob=?,gender=?,phone_number=?,height=?, weight=?, bmi=?, medical_history=?, allergies=?, current_medications=? WHERE user_id=?");
    if (!empty($password)){
-    $password_hash=password_hash($password,PASSWORD_DEFAULT);
+    $password_hash=$password;
     $stmt->bind_param("sssssssdddsssi",$first_name, $last_name, $email,$password, $dob, $gender, $phone_number, $height, $weight, $bmi, $medical_history, $allergies, $current_medications, $id);
    }else{
     $stmt->bind_param("sssssssdddsssi",$first_name, $last_name, $email,$password, $dob, $gender, $phone_number, $height, $weight, $bmi, $medical_history, $allergies, $current_medications, $id);
@@ -116,133 +125,145 @@ $result=$conn->query("SELECT * FROM Users");
 ?>
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Management - Admin</title>
-    <style>
-     body{
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-     }
-     .error{
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>User Management - Admin</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <!-- Bootstrap CSS-->
+  <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+  <!-- Font Awesome CSS-->
+  <link rel="stylesheet" href="vendor/font-awesome/css/font-awesome.min.css">
+  <!-- Custom Font Icons CSS-->
+  <link rel="stylesheet" href="css/font.css">
+  <!-- Google fonts - Muli-->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Muli:300,400,700">
+  <!-- theme stylesheet-->
+  <link rel="stylesheet" href="css/style.default.css" id="theme-stylesheet">
+  <!-- Custom stylesheet - for your changes-->
+  <link rel="stylesheet" href="css/custom.css">
+  <!-- Favicon-->
+  <link rel="shortcut icon" href="img/favicon.ico">
+
+
+  <style>
+    .error{
         color:red;
-     }
-     .add{
+    }
+    .add{
         width:40%;
         margin:0 auto;
         padding:20px;
-        background-color: #fff;
         border-radius:8px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-     }
-     .add form input,
-     .add select{
+    }
+    .add form input,
+    .add select{
         width: 50%;
         margin-bottom:10px;
         padding:10px;
-        border:1px solid #ccc;
         border-radius:4px;
-        justify-content:center;
-     }
-     .table-responsive {
-        overflow-x: hidden; 
-     }
-
-     table {
-      width: 100%; 
+        box-sizing: border-box;
+    }
+    .add form button {
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+        width: 100%; 
+    }
+   table {
+      width: 100%;
       border-collapse: collapse;
-      table-layout: fixed; 
-     }
+    }
 
-     th, td {
-      padding: 8px; 
+    table,
+    th,
+    td {
+      border: 1px solid black;
+    }
+
+    th,
+    td {
+      padding: 10px;
       text-align: left;
-      border: 1px solid #ddd;
-      overflow: hidden; 
-      text-overflow: ellipsis; 
-      white-space: nowrap; 
-     }
+    }
 
-     th {
-      background-color: #f2f2f2;
-     }
-
-     tr:hover {
-     background-color: #f5f5f5;
-     }
-
-     td:nth-child(1), th:nth-child(1) { width: 8%; } /* User ID */
-     td:nth-child(2), th:nth-child(2) { width: 12%; } /* First Name */
-     td:nth-child(3), th:nth-child(3) { width: 12%; } /* Last Name */
-     td:nth-child(4), th:nth-child(4) { width: 20%; } /* Email */
-     td:nth-child(5), th:nth-child(5) { width: 15%; } /*password*/
-     td:nth-child(6), th:nth-child(6) { width: 12%; } /* DOB */
-     td:nth-child(7), th:nth-child(7) { width: 7%; } /* Gender */
-     td:nth-child(8), th:nth-child(8) { width: 10%; }  /* Phone Number */
-     td:nth-child(9), th:nth-child(9) { width: 7%; }  /* Height */
-     td:nth-child(10), th:nth-child(10) { width: 5%; } /* Weight */
-     td:nth-child(11), th:nth-child(11) { width: 5%; } /* BMI */
-     td:nth-child(12), th:nth-child(12) { width: 10%; } /* Medical History */
-     td:nth-child(13), th:nth-child(13) { width: 10%; } /* Allergies */
-     td:nth-child(14), th:nth-child(14) { width: 10%; } /* Current Medications */
-     td:nth-child(15), th:nth-child(15) { width: 15%; } /* Actions */
-
-     .save-btn {
+    .form-row {
       display: none;
-     }
+    }
 
-     td>div{
-      text-align:center;
-     }
-      
-     button {
-      margin-bottom: 5px; 
-      padding: 5px 10px; 
-      cursor: pointer;  
-     }
-     button:hover{
-        cursor:pointer;
-     }
+    .form-row input,
+    .form-row select {
+      width: 100%;
+    }
 
-     input[type="text"], input[type="email"], input[type="date"], input[type="password"], select {
-      width: 100%; 
-      padding: 5px; 
-      box-sizing: border-box; 
-     }
+    .form-row td {
+      padding: 5px;
+    }
 
-     @media (max-width: 768px) {
-      th, td {
-        font-size: 12px; 
-        padding: 5px; 
-        white-space: normal; 
-      }
-     }
+    #add-button {
+      margin-bottom: 10px;
+      color:  #ced4da;
+      background-color: #6c757d;
 
-    </style>
-    </head>
-    <body>
-        <h1>Users</h1>
+
+    }
+    button{
+      color:  #ced4da;
+      background-color: #6c757d;
+    }
+
+    .edit-form {
+      display: none;
+    }
+
+    .form-row, .edit-form {
+    display: none; /* Hide the rows initially */
+  }
+
+  </style>
+</head>
+
+<body>
+
+  <!--el header file henaaaa-->
+   <?php include 'header.html';?>
+
+  <div class="d-flex align-items-stretch">
+  <!--sideee-->
+  <?php include 'side.html';?>
+
+      <section class="no-padding-top">
+        <div class="container-fluid">
+
+
+          <div class="block">
+            <h1>Users</h1>
         <div class="add" style="text-align:center">
            <h2>add user</h2>
             <form method="POST" action="">
-                First Name: <input type="text" name="first_name" placeholder="First Name" value="<?= htmlspecialchars($data['first_name'] ?? '') ?>" required><br>
-                Last Name: <input type="text" name="last_name" placeholder="Last Name" value="<?= htmlspecialchars($data['last_name'] ?? '') ?>" required><br>
-                Email: <input type="email" name="email" placeholder="Email"  value="<?= htmlspecialchars($data['email'] ?? '') ?>" required><br>
-                Password: <input type="password" name="password" placeholder="Password" required><br>
-                Date of Birth:<input type="date" name="dob" placeholder="Date of Birth"  value="<?= htmlspecialchars($data['dob'] ?? '') ?>" required><br>
-                Gender:<select name="gender" required>
+                First Name:<br> <input type="text" name="first_name" placeholder="First Name" value="<?= htmlspecialchars($data['first_name'] ?? '') ?>" required><br>
+                Last Name:<br> <input type="text" name="last_name" placeholder="Last Name" value="<?= htmlspecialchars($data['last_name'] ?? '') ?>" required><br>
+                Email: <br><input type="email" name="email" placeholder="Email"  value="<?= htmlspecialchars($data['email'] ?? '') ?>" required><br>
+                Password: <br><input type="password" name="password" placeholder="Password" required><br>
+                Date of Birth:<br><input type="date" name="dob" placeholder="Date of Birth"  value="<?= htmlspecialchars($data['dob'] ?? '') ?>" required><br>
+                Gender:<br><select name="gender" required>
                          <option value="">Select Gender</option>
                          <option value="Male" <?= (isset($data['gender']) && $data['gender'] === 'Male') ? 'selected' : '' ?>>Male</option>
                          <option value="Female" <?= (isset($data['gender']) && $data['gender'] === 'Female') ? 'selected' : '' ?>>Female</option>
                         </select><br>
-                Phone Number: <input type="text" name="phone_number" placeholder="Phone Number" value="<?= htmlspecialchars($data['phone_number'] ?? '') ?>" required><br>
-                Height:  <input type="text" name="height" placeholder="Height (cm)" value="<?= htmlspecialchars($data['height'] ?? '') ?>" required><br>
-                Weight:<input type="text" name="weight" placeholder="Weight (kg)" value="<?= htmlspecialchars($data['weight'] ?? '') ?>" required><br>
-                Medical History : <input type="text" name="medical_history" placeholder="Medical History" value="<?= htmlspecialchars($data['medical_history'] ?? '') ?>" required><br>
-                Allergies: <input type="text" name="allergies" placeholder="Allergies"  value="<?= htmlspecialchars($data['allergies'] ?? '') ?>" required><br>
-                Cuurent Medications:<input type="text" name="current_medications" placeholder="Current Medications"  value="<?= htmlspecialchars($data['current_medications'] ?? '') ?>" required><br>
+                Phone Number:<br> <input type="text" name="phone_number" placeholder="Phone Number" value="<?= htmlspecialchars($data['phone_number'] ?? '') ?>" required><br>
+                Height: <br> <input type="text" name="height" placeholder="Height (cm)" value="<?= htmlspecialchars($data['height'] ?? '') ?>" required><br>
+                Weight:<br><input type="text" name="weight" placeholder="Weight (kg)" value="<?= htmlspecialchars($data['weight'] ?? '') ?>" required><br>
+                Medical History :<br> <input type="text" name="medical_history" placeholder="Medical History" value="<?= htmlspecialchars($data['medical_history'] ?? '') ?>" required><br>
+                Allergies: <br><input type="text" name="allergies" placeholder="Allergies"  value="<?= htmlspecialchars($data['allergies'] ?? '') ?>" required><br>
+                Cuurent Medications:<br><input type="text" name="current_medications" placeholder="Current Medications"  value="<?= htmlspecialchars($data['current_medications'] ?? '') ?>" required><br>
                 <button type="submit" name="add_user">Add User</button>
             </form>
             <?php if(!empty($errors)):?>
@@ -255,27 +276,30 @@ $result=$conn->query("SELECT * FROM Users");
             </div>
             <?php endif;?>
         </div>
-        <h2>User list</h2>
-     <div class="table_responsive">
-        <table >
-            <tr>
-             <th>User ID</th>
-             <th>First Name</th>
-             <th>Last Name</th>
-             <th>Email</th>
-             <th>Password</th>
-             <th>DOB</th>
-             <th>Gender</th>
-             <th>Phone Number</th>
-             <th>Height</th>
-             <th>Weight</th>
-             <th>BMI</th>
-             <th>Medical History</th>
-             <th>Allergies</th>
-             <th>Current Medications</th>
-             <th>Actions</th>
-            </tr>
-            <?php while($user=$result->fetch_assoc()):?>
+            <div class="title"><strong>User Table</strong></div>
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <!-- <thead> -->
+                  <tr>
+                  <th>User ID</th>
+                  <th>First Name</th>
+                 <th>Last Name</th>
+                 <th>Email</th>
+                 <th>Password</th>
+                 <th>DOB</th>
+                 <th>Gender</th>
+                 <th>Phone Number</th>
+                 <th>Height</th>
+                 <th>Weight</th>
+                 <th>BMI</th>
+                 <th>Medical History</th>
+                 <th>Allergies</th>
+                 <th>Current Medications</th>
+                 <th>Actions</th>
+                  </tr>
+                <!-- </thead> -->
+                <tbody>
+                <?php while($user=$result->fetch_assoc()):?>
             <tr id="user-<?=$user['user_id']?>">
               <form method="POST" action="" >
                <td><?= htmlspecialchars($user['user_id']) ?></td>
@@ -313,7 +337,15 @@ $result=$conn->query("SELECT * FROM Users");
             <?php endwhile; ?>
         </table>
       </div>
-      <script>
+  <!-- JavaScript files-->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/popper.js/umd/popper.min.js"> </script>
+  <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+  <script src="vendor/jquery.cookie/jquery.cookie.js"> </script>
+  <script src="vendor/chart.js/Chart.min.js"></script>
+  <script src="vendor/jquery-validation/jquery.validate.min.js"></script>
+  <script src="js/front.js"></script>
+  <script>
         let originalValues={};
         function toggleEdit(userId){
             const row=document.getElementById(`user-${userId}`);
@@ -446,7 +478,7 @@ $result=$conn->query("SELECT * FROM Users");
         });
     });
     </script>
-  </body>
+</body>
 </html>
 <?php
  $conn->close();
