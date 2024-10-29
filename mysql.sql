@@ -40,7 +40,7 @@ CREATE TABLE Appointments (
     doctor_id INT NOT NULL,
     appointment_date DATE NOT NULL,
     appointment_time TIME NOT NULL,
-    status VARCHAR(20) DEFAULT 'pending',  -- Status can be 'pending', 'confirmed', 'canceled', etc.
+    status VARCHAR(20) DEFAULT 'confirmed',  -- Status can be 'pending', 'confirmed', 'canceled', etc.
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,

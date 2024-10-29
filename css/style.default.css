@@ -1943,7 +1943,7 @@ input.input-material.is-invalid {
 }
 
 input.input-material:focus {
-  border-color: #DB6574;
+  border-color: #9679ff;
 }
 
 input.input-material ~ label {
@@ -1960,11 +1960,11 @@ input.input-material ~ label {
 input.input-material ~ label.active {
   font-size: 0.85rem;
   top: -10px;
-  color: #DB6574;
+  color: #8865db;
 }
 
 input.input-material ~ label.is-invalid ~ label {
-  color: #bb414d;
+  color: hsl(354, 48%, 49%);
 }
 
 .form-group-material {
